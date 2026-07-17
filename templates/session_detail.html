@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Treino de {{ session.date.strftime('%d/%m/%Y') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Treino de {{ session.date.strftime('%d/%m/%Y') }}</h1>
+    <p class="muted">
+      {{ session.plan.name if session.plan else 'Treino livre' }}
+      · {{ session.set_logs|length }} séries
+      · volume total {{ '%.0f'|format(session.total_volume) }} kg
+    </p>
+    {% if session.notes %}<p>📝 {{ session.notes }}</p>{% endif %}
+  </div>
+  <a class="btn btn-outline" href="{{ url_for('history') }}">← Voltar ao histórico</a>
+</div>
+
+{% for exercise_name, sets in grouped.items() %}
+<section class="card">
+  <h3>{{ exercise_name }}</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Série</th><th>Repetições</th><th>Peso (kg)</th></tr></thead>
+      <tbody>
+        {% for s in sets|sort(attribute='set_number') %}
+        <tr>
+          <td>{{ s.set_number }}</td>
+          <td>{{ s.reps if s.reps is not none else '—' }}</td>
+          <td>{{ s.weight_kg if s.weight_kg is not none else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

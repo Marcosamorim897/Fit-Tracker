@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Medidas{% endblock %}
+{% block content %}
+<h1>Medidas corporais</h1>
+
+<section class="card">
+  <h3>Registrar novas medidas</h3>
+  <form method="post" class="measure-form">
+    <div class="form-grid">
+      <label>Data
+        <input type="date" name="date" value="{{ today.isoformat() }}" required>
+      </label>
+      {% for field, label in fields %}
+      <label>{{ label }}
+        <input type="number" name="{{ field }}" step="0.1" min="0">
+      </label>
+      {% endfor %}
+    </div>
+    <label>Observações
+      <input type="text" name="notes" placeholder="Ex.: medido em jejum">
+    </label>
+    <button class="btn btn-primary" type="submit">Salvar medidas</button>
+  </form>
+</section>
+
+<section class="card">
+  <h3>Histórico de medidas</h3>
+  {% if items %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          {% for field, label in fields %}<th>{{ label }}</th>{% endfor %}
+          <th>IMC</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in items %}
+        <tr>
+          <td>{{ m.date.strftime('%d/%m/%Y') }}</td>
+          {% for field, label in fields %}
+          <td>{{ m[field] if m[field] is not none else '—' }}</td>
+          {% endfor %}
+          <td>{{ m.bmi(current_user.height_cm) or '—' }}</td>
+          <td>
+            <form method="post" action="{{ url_for('delete_measurement', measure_id=m.id) }}"
+                  onsubmit="return confirm('Excluir este registro de medidas?')">
+              <button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhuma medida registrada ainda.</p>
+  {% endif %}
+</section>
+{% endblock %}

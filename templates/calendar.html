@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Calendário{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Calendário de treinos</h1>
+  <div class="calendar-nav">
+    <a class="btn btn-outline btn-sm" href="{{ url_for('calendar_view', year=prev_month.year, month=prev_month.month) }}">← {{ prev_month.strftime('%m/%Y') }}</a>
+    <strong>{{ month_name }} {{ year }}</strong>
+    <a class="btn btn-outline btn-sm" href="{{ url_for('calendar_view', year=next_month.year, month=next_month.month) }}">{{ next_month.strftime('%m/%Y') }} →</a>
+  </div>
+</div>
+
+<div class="card">
+  <table class="calendar">
+    <thead>
+      <tr><th>Dom</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sáb</th></tr>
+    </thead>
+    <tbody>
+      {% for week in weeks %}
+      <tr>
+        {% for day in week %}
+        {% if day == 0 %}
+        <td class="empty"></td>
+        {% else %}
+        <td class="{% if day == today.day and month == today.month and year == today.year %}today{% endif %} {% if by_day[day] %}has-workout{% endif %}">
+          <span class="day-number">{{ day }}</span>
+          {% for s in by_day[day] %}
+          <a class="calendar-session" href="{{ url_for('session_detail', session_id=s.id) }}">
+            🏋️ {{ s.plan.name if s.plan else 'Treino' }}
+          </a>
+          {% endfor %}
+        </td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="muted">Dias com 🏋️ são dias em que você treinou. Clique para ver os detalhes.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Painel{% endblock %}
+{% block content %}
+<h1>Olá, {{ current_user.name.split(' ')[0] }} 👋</h1>
+
+<div class="stats-grid">
+  <div class="card stat">
+    <span class="stat-value">{{ sessions_month }}</span>
+    <span class="stat-label">treinos neste mês</span>
+  </div>
+  <div class="card stat">
+    <span class="stat-value">{{ total_sessions }}</span>
+    <span class="stat-label">treinos no total</span>
+  </div>
+  <div class="card stat">
+    <span class="stat-value">{{ last_measure.weight_kg or '—' if last_measure else '—' }}</span>
+    <span class="stat-label">peso atual (kg)</span>
+  </div>
+  <div class="card stat">
+    <span class="stat-value">{{ bmi or '—' }}</span>
+    <span class="stat-label">IMC {% if bmi_label %}· {{ bmi_label }}{% endif %}</span>
+  </div>
+</div>
+
+{% if not current_user.height_cm %}
+<div class="alert alert-info">
+  Cadastre sua altura no <a href="{{ url_for('profile') }}">perfil</a> para calcular o IMC automaticamente.
+</div>
+{% endif %}
+
+<div class="two-cols">
+  <section class="card">
+    <div class="card-header">
+      <h3>Fichas ativas</h3>
+      <a class="btn btn-sm btn-outline" href="{{ url_for('new_plan') }}">+ Nova ficha</a>
+    </div>
+    {% if active_plans %}
+      <ul class="list">
+        {% for plan in active_plans %}
+        <li>
+          <a href="{{ url_for('plan_detail', plan_id=plan.id) }}">{{ plan.name }}</a>
+          <span class="muted">{{ plan.exercises|length }} exercícios</span>
+          <a class="btn btn-sm btn-primary" href="{{ url_for('log_workout', plan_id=plan.id) }}">Treinar</a>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">Você ainda não tem fichas. <a href="{{ url_for('new_plan') }}">Crie a primeira</a>.</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <h3>Últimos treinos</h3>
+      <a class="btn btn-sm btn-outline" href="{{ url_for('history') }}">Ver tudo</a>
+    </div>
+    {% if recent_sessions %}
+      <ul class="list">
+        {% for s in recent_sessions %}
+        <li>
+          <a href="{{ url_for('session_detail', session_id=s.id) }}">
+            {{ s.date.strftime('%d/%m/%Y') }} — {{ s.plan.name if s.plan else 'Treino livre' }}
+          </a>
+          <span class="muted">{{ s.set_logs|length }} séries · {{ '%.0f'|format(s.total_volume) }} kg de volume</span>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">Nenhum treino registrado ainda. <a href="{{ url_for('choose_workout') }}">Registre o primeiro</a>!</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

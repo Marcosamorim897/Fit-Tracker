@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar ficha' if plan else 'Nova ficha' }}{% endblock %}
+{% block content %}
+<div class="auth-card card">
+  <h2>{{ 'Editar ficha' if plan else 'Nova ficha de treino' }}</h2>
+  <form method="post">
+    <label>Nome da ficha*
+      <input type="text" name="name" required placeholder="Ex.: Treino A — Peito e tríceps"
+             value="{{ plan.name if plan else (request.form.name or '') }}">
+    </label>
+    <label>Descrição
+      <textarea name="description" rows="3"
+                placeholder="Ex.: foco em hipertrofia, 3x por semana">{{ plan.description or '' if plan else (request.form.description or '') }}</textarea>
+    </label>
+    {% if plan %}
+    <label class="checkbox">
+      <input type="checkbox" name="active" {% if plan.active %}checked{% endif %}> Ficha ativa
+    </label>
+    {% endif %}
+    <button class="btn btn-primary btn-block" type="submit">{{ 'Salvar alterações' if plan else 'Criar ficha' }}</button>
+  </form>
+  {% if plan %}
+  <form method="post" action="{{ url_for('delete_plan', plan_id=plan.id) }}"
+        onsubmit="return confirm('Excluir esta ficha e todos os seus exercícios?')">
+    <button class="btn btn-danger btn-block" type="submit">Excluir ficha</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

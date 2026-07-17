@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "fittracker",
+      "cwd": "/home/marcos/Documentos/fit-tracker",
+      "runtimeExecutable": "/home/marcos/Documentos/fit-tracker/.venv/bin/python",
+      "runtimeArgs": ["/home/marcos/Documentos/fit-tracker/app.py"],
+      "port": 5000
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ plan.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ plan.name }} {% if not plan.active %}<span class="badge">inativa</span>{% endif %}</h1>
+    {% if plan.description %}<p class="muted">{{ plan.description }}</p>{% endif %}
+  </div>
+  <div>
+    <a class="btn btn-primary" href="{{ url_for('log_workout', plan_id=plan.id) }}">Treinar com esta ficha</a>
+    <a class="btn btn-outline" href="{{ url_for('edit_plan', plan_id=plan.id) }}">Editar</a>
+  </div>
+</div>
+
+<section class="card">
+  <h3>Exercícios da ficha</h3>
+  {% if plan.exercises %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Exercício</th><th>Grupo muscular</th>
+          <th>Séries</th><th>Repetições</th><th>Descanso</th><th>Obs.</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ex in plan.exercises %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td><strong>{{ ex.name }}</strong></td>
+          <td>{{ ex.muscle_group or '—' }}</td>
+          <td>{{ ex.target_sets }}</td>
+          <td>{{ ex.target_reps }}</td>
+          <td>{{ ex.rest_seconds ~ 's' if ex.rest_seconds else '—' }}</td>
+          <td>{{ ex.notes or '—' }}</td>
+          <td>
+            <form method="post" action="{{ url_for('delete_exercise', exercise_id=ex.id) }}"
+                  onsubmit="return confirm('Remover {{ ex.name }} da ficha?')">
+              <button class="btn btn-sm btn-danger" type="submit">Remover</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhum exercício ainda. Adicione abaixo. 👇</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h3>Adicionar exercício</h3>
+  <form method="post">
+    <div class="form-grid">
+      <label>Nome do exercício*
+        <input type="text" name="name" required placeholder="Ex.: Supino reto">
+      </label>
+      <label>Grupo muscular
+        <input type="text" name="muscle_group" placeholder="Ex.: Peitoral" list="muscle-groups">
+        <datalist id="muscle-groups">
+          <option>Peitoral</option><option>Costas</option><option>Pernas</option>
+          <option>Ombros</option><option>Bíceps</option><option>Tríceps</option>
+          <option>Abdômen</option><option>Glúteos</option><option>Panturrilha</option>
+          <option>Cardio</option>
+        </datalist>
+      </label>
+      <label>Séries
+        <input type="number" name="target_sets" min="1" max="20" value="3">
+      </label>
+      <label>Repetições
+        <input type="text" name="target_reps" value="10" placeholder="Ex.: 10 ou 8-12">
+      </label>
+      <label>Descanso (segundos)
+        <input type="number" name="rest_seconds" min="0" step="15" placeholder="60">
+      </label>
+      <label>Observações
+        <input type="text" name="notes" placeholder="Ex.: cadência lenta">
+      </label>
+    </div>
+    <button class="btn btn-primary" type="submit">Adicionar exercício</button>
+  </form>
+</section>
+{% endblock %}

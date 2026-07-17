@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Progresso{% endblock %}
+{% block content %}
+<h1>Evolução</h1>
+
+<div class="two-cols">
+  <section class="card">
+    <h3>Peso corporal (kg)</h3>
+    <canvas id="chart-weight"></canvas>
+  </section>
+  <section class="card">
+    <h3>IMC</h3>
+    <canvas id="chart-bmi"></canvas>
+  </section>
+  <section class="card">
+    <h3>Cintura (cm)</h3>
+    <canvas id="chart-waist"></canvas>
+  </section>
+  <section class="card">
+    <h3>Gordura corporal (%)</h3>
+    <canvas id="chart-fat"></canvas>
+  </section>
+</div>
+
+<section class="card">
+  <div class="card-header">
+    <h3>Evolução por exercício</h3>
+    <select id="exercise-select">
+      <option value="">Selecione um exercício…</option>
+      {% for name in exercise_names %}
+      <option value="{{ name }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {% if exercise_names %}
+  <div class="two-cols">
+    <div>
+      <h4>Carga máxima (kg)</h4>
+      <canvas id="chart-max-weight"></canvas>
+    </div>
+    <div>
+      <h4>Volume total (reps × kg)</h4>
+      <canvas id="chart-volume"></canvas>
+    </div>
+  </div>
+  {% else %}
+  <p class="muted">Registre treinos para ver a evolução de carga por exercício.</p>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/progress.js') }}"></script>
+{% endblock %}

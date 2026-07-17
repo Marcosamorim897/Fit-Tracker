@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Treinar{% endblock %}
+{% block content %}
+<h1>Registrar treino</h1>
+<p class="muted">Escolha a ficha que você vai executar hoje:</p>
+
+{% if plans %}
+<div class="cards-grid">
+  {% for plan in plans %}
+  <div class="card plan-card">
+    <h3>{{ plan.name }}</h3>
+    <p class="muted">{{ plan.exercises|length }} exercícios</p>
+    <a class="btn btn-primary" href="{{ url_for('log_workout', plan_id=plan.id) }}">Começar</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <p class="muted">Você não tem fichas ativas. Crie uma ficha antes de registrar um treino.</p>
+  <a class="btn btn-primary" href="{{ url_for('new_plan') }}">Criar ficha</a>
+</div>
+{% endif %}
+{% endblock %}

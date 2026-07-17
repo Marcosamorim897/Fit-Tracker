@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Início{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Controle seus treinos.<br>Acompanhe sua evolução.</h1>
+  <p>Monte suas fichas de treino, registre repetições e cargas a cada sessão e veja
+     sua evolução em gráficos — peso, medidas, IMC e força.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{{ url_for('register') }}">Criar conta grátis</a>
+    <a class="btn btn-outline" href="{{ url_for('login') }}">Já tenho conta</a>
+  </div>
+</section>
+
+<section class="features">
+  <div class="card feature">
+    <h3>📋 Fichas de treino</h3>
+    <p>Cadastre seus treinos com exercícios, séries, repetições e descanso.</p>
+  </div>
+  <div class="card feature">
+    <h3>✍️ Registro de execução</h3>
+    <p>Durante o treino, anote repetições e pesos de cada série.</p>
+  </div>
+  <div class="card feature">
+    <h3>📈 Evolução em gráficos</h3>
+    <p>Veja a progressão de carga, volume, peso corporal e IMC ao longo do tempo.</p>
+  </div>
+  <div class="card feature">
+    <h3>📏 Medidas corporais</h3>
+    <p>Registre peso, cintura, braços, coxas e mais, com histórico completo.</p>
+  </div>
+  <div class="card feature">
+    <h3>📅 Calendário</h3>
+    <p>Visualize seus dias de treino no mês e mantenha a constância.</p>
+  </div>
+  <div class="card feature">
+    <h3>🧮 IMC e resumo corporal</h3>
+    <p>Cálculo automático de IMC e classificação com base nas suas medidas.</p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Treinar — {{ plan.name }}{% endblock %}
+{% block content %}
+<h1>Registrando: {{ plan.name }}</h1>
+<p class="muted">Preencha as repetições e o peso de cada série conforme for executando.
+   Séries em branco não são salvas.</p>
+
+{% if not plan.exercises %}
+<div class="card">
+  <p class="muted">Esta ficha ainda não tem exercícios.</p>
+  <a class="btn btn-primary" href="{{ url_for('plan_detail', plan_id=plan.id) }}">Adicionar exercícios</a>
+</div>
+{% else %}
+<form method="post">
+  <div class="card">
+    <div class="form-row">
+      <label>Data do treino
+        <input type="date" name="date" value="{{ today.isoformat() }}" required>
+      </label>
+      <label>Observações
+        <input type="text" name="notes" placeholder="Ex.: dormi mal, carga leve hoje">
+      </label>
+    </div>
+  </div>
+
+  {% for ex in plan.exercises %}
+  <div class="card exercise-log">
+    <div class="card-header">
+      <h3>{{ ex.name }}</h3>
+      <span class="muted">
+        Meta: {{ ex.target_sets }}×{{ ex.target_reps }}
+        {% if ex.rest_seconds %} · descanso {{ ex.rest_seconds }}s{% endif %}
+        {% if last_sets[ex.id] is defined %}
+          · última vez: {{ last_sets[ex.id].reps or '?' }} reps × {{ last_sets[ex.id].weight_kg or '?' }} kg
+        {% endif %}
+      </span>
+    </div>
+    {% if ex.notes %}<p class="muted">📝 {{ ex.notes }}</p>{% endif %}
+    <div class="sets-grid">
+      {% for n in range(1, ex.target_sets + 1) %}
+      <div class="set-row">
+        <span class="set-label">Série {{ n }}</span>
+        <input type="number" name="reps_{{ ex.id }}_{{ n }}" min="0" placeholder="reps" inputmode="numeric">
+        <input type="number" name="weight_{{ ex.id }}_{{ n }}" min="0" step="0.5" placeholder="kg" inputmode="decimal">
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <button class="btn btn-primary btn-block btn-lg" type="submit">Salvar treino ✔</button>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Cadastro{% endblock %}
+{% block content %}
+<div class="auth-card card">
+  <h2>Criar conta</h2>
+  <form method="post">
+    <label>Nome*
+      <input type="text" name="name" required value="{{ request.form.name or '' }}">
+    </label>
+    <label>E-mail*
+      <input type="email" name="email" required value="{{ request.form.email or '' }}">
+    </label>
+    <div class="form-row">
+      <label>Senha* (mín. 6 caracteres)
+        <input type="password" name="password" minlength="6" required>
+      </label>
+      <label>Confirmar senha*
+        <input type="password" name="confirm" minlength="6" required>
+      </label>
+    </div>
+    <div class="form-row">
+      <label>Altura (cm)
+        <input type="number" name="height_cm" step="0.1" min="50" max="260" value="{{ request.form.height_cm or '' }}">
+      </label>
+      <label>Data de nascimento
+        <input type="date" name="birth_date" value="{{ request.form.birth_date or '' }}">
+      </label>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Cadastrar</button>
+  </form>
+  <p class="muted">Já tem conta? <a href="{{ url_for('login') }}">Entrar</a></p>
+</div>
+{% endblock %}

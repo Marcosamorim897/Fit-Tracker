@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Histórico{% endblock %}
+{% block content %}
+<h1>Histórico de treinos</h1>
+
+{% if sessions %}
+<div class="table-wrap card">
+  <table>
+    <thead>
+      <tr><th>Data</th><th>Ficha</th><th>Séries</th><th>Volume total (kg)</th><th>Obs.</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for s in sessions %}
+      <tr>
+        <td><a href="{{ url_for('session_detail', session_id=s.id) }}">{{ s.date.strftime('%d/%m/%Y') }}</a></td>
+        <td>{{ s.plan.name if s.plan else 'Treino livre' }}</td>
+        <td>{{ s.set_logs|length }}</td>
+        <td>{{ '%.0f'|format(s.total_volume) }}</td>
+        <td>{{ s.notes or '—' }}</td>
+        <td>
+          <form method="post" action="{{ url_for('delete_session', session_id=s.id) }}"
+                onsubmit="return confirm('Excluir este treino do histórico?')">
+            <button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card">
+  <p class="muted">Nenhum treino registrado ainda.</p>
+  <a class="btn btn-primary" href="{{ url_for('choose_workout') }}">Registrar meu primeiro treino</a>
+</div>
+{% endif %}
+{% endblock %}

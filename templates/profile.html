@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Perfil{% endblock %}
+{% block content %}
+<div class="auth-card card">
+  <h2>Meu perfil</h2>
+  <p class="muted">{{ current_user.email }}{% if current_user.age %} · {{ current_user.age }} anos{% endif %}</p>
+  <form method="post">
+    <label>Nome
+      <input type="text" name="name" required value="{{ current_user.name }}">
+    </label>
+    <div class="form-row">
+      <label>Altura (cm)
+        <input type="number" name="height_cm" step="0.1" min="50" max="260"
+               value="{{ current_user.height_cm or '' }}">
+      </label>
+      <label>Data de nascimento
+        <input type="date" name="birth_date"
+               value="{{ current_user.birth_date.isoformat() if current_user.birth_date else '' }}">
+      </label>
+    </div>
+    <label>Nova senha (deixe em branco para manter a atual)
+      <input type="password" name="new_password" minlength="6">
+    </label>
+    <button class="btn btn-primary btn-block" type="submit">Salvar</button>
+  </form>
+</div>
+{% endblock %}
