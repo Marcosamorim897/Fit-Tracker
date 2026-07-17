@@ -125,6 +125,38 @@ class WorkoutSession(db.Model):
         return sum((s.reps or 0) * (s.weight_kg or 0) for s in self.set_logs)
 
 
+class WhatsAppLink(db.Model):
+    __tablename__ = "whatsapp_links"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True
+    )
+    phone_number = db.Column(db.String(30), unique=True, nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref=db.backref("whatsapp_link", uselist=False))
+
+
+class WhatsAppLinkCode(db.Model):
+    __tablename__ = "whatsapp_link_codes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    code = db.Column(db.String(6), nullable=False, index=True)
+    expires_at = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship("User")
+
+
+class WhatsAppChatState(db.Model):
+    __tablename__ = "whatsapp_chat_states"
+
+    phone_number = db.Column(db.String(30), primary_key=True)
+    state = db.Column(db.Text)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class SetLog(db.Model):
     __tablename__ = "set_logs"
 

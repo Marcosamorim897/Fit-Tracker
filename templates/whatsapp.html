@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}WhatsApp{% endblock %}
+{% block content %}
+<div class="auth-card card">
+  <h2>📱 Registrar treinos pelo WhatsApp</h2>
+
+  {% if link %}
+  <div class="alert alert-success">
+    WhatsApp vinculado: <strong>+{{ link.phone_number }}</strong>
+  </div>
+  <p class="muted">Mande <strong>treinar</strong> no chat do bot para registrar um treino,
+     <strong>peso 78,5</strong> para registrar seu peso, ou <strong>historico</strong>
+     para ver os últimos treinos.</p>
+  <form method="post" onsubmit="return confirm('Desvincular este WhatsApp da sua conta?')">
+    <input type="hidden" name="action" value="unlink">
+    <button class="btn btn-danger btn-block" type="submit">Desvincular WhatsApp</button>
+  </form>
+  {% else %}
+  <p>Vincule seu WhatsApp em 3 passos:</p>
+  <ol>
+    <li>Clique no botão abaixo para gerar seu código</li>
+    <li>Abra o WhatsApp e mande o código para o número do bot
+        {% if bot_number %}<strong>{{ bot_number }}</strong>{% else %}(informado pelo administrador){% endif %}</li>
+    <li>Pronto! Mande <strong>treinar</strong> e siga a conversa</li>
+  </ol>
+
+  {% if code %}
+  <div class="alert alert-info" style="text-align:center">
+    Seu código (válido por 15 minutos):
+    <div style="font-size:2rem; font-weight:700; letter-spacing:0.3rem">{{ code }}</div>
+  </div>
+  {% endif %}
+
+  <form method="post">
+    <button class="btn btn-primary btn-block" type="submit">
+      {{ 'Gerar novo código' if code else 'Gerar código de vínculo' }}
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -10,3 +10,16 @@ services:
         generateValue: true
       - key: DATABASE_URL
         sync: false # cole aqui a URL do banco Postgres (ex.: Neon)
+      - key: SITE_URL
+        value: https://fit-tracker-9z2h.onrender.com
+      # --- Bot de WhatsApp (Meta Cloud API) — configure no painel do Render ---
+      - key: WA_TOKEN
+        sync: false # token permanente da Cloud API
+      - key: WA_PHONE_NUMBER_ID
+        sync: false # "Phone number ID" do número do bot
+      - key: WA_VERIFY_TOKEN
+        sync: false # string à sua escolha; a mesma vai no webhook da Meta
+      - key: WA_APP_SECRET
+        sync: false # App Secret da Meta (valida a assinatura do webhook)
+      - key: WA_BOT_NUMBER
+        sync: false # número do bot exibido na página /whatsapp (ex.: +1 555...)
