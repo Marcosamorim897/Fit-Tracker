@@ -26,13 +26,10 @@ from models import (
     PlanExercise,
     SetLog,
     User,
-    WhatsAppLink,
-    WhatsAppLinkCode,
     WorkoutPlan,
     WorkoutSession,
     db,
 )
-from whatsapp_bot import wa
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -55,7 +52,8 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 
 db.init_app(app)
-app.register_blueprint(wa)
+# Bot de WhatsApp desativado por enquanto (blueprint em whatsapp_bot.py);
+# para reativar, importe `wa` e registre o blueprint novamente.
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
@@ -205,38 +203,6 @@ def profile():
         flash("Perfil atualizado.", "success")
         return redirect(url_for("profile"))
     return render_template("profile.html")
-
-
-@app.route("/whatsapp", methods=["GET", "POST"])
-@login_required
-def whatsapp_link():
-    import secrets
-
-    link = WhatsAppLink.query.filter_by(user_id=current_user.id).first()
-    code = None
-    if request.method == "POST":
-        if request.form.get("action") == "unlink":
-            if link:
-                db.session.delete(link)
-                db.session.commit()
-                flash("WhatsApp desvinculado.", "info")
-            return redirect(url_for("whatsapp_link"))
-        WhatsAppLinkCode.query.filter_by(user_id=current_user.id).delete()
-        code = f"{secrets.randbelow(1_000_000):06d}"
-        db.session.add(
-            WhatsAppLinkCode(
-                user_id=current_user.id,
-                code=code,
-                expires_at=datetime.utcnow() + timedelta(minutes=15),
-            )
-        )
-        db.session.commit()
-    return render_template(
-        "whatsapp.html",
-        link=link,
-        code=code,
-        bot_number=os.environ.get("WA_BOT_NUMBER"),
-    )
 
 
 # ---------------------------------------------------------------- dashboard
