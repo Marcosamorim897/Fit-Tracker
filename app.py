@@ -3,7 +3,16 @@ import os
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 
-from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
 from flask_login import (
     LoginManager,
     current_user,
@@ -96,6 +105,20 @@ def bmi_class(bmi):
     if bmi < 40:
         return "Obesidade grau II"
     return "Obesidade grau III"
+
+
+# ---------------------------------------------------------------- pwa
+
+
+@app.route("/sw.js")
+def service_worker():
+    # servido da raiz para que o service worker tenha escopo "/"
+    resp = send_from_directory(
+        os.path.join(BASE_DIR, "static", "js"), "sw.js", mimetype="text/javascript"
+    )
+    # sem cache: atualizações do sw.js valem já no próximo carregamento
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp
 
 
 # ---------------------------------------------------------------- auth
