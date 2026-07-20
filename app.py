@@ -122,6 +122,14 @@ def service_worker():
 # ---------------------------------------------------------------- auth
 
 
+@app.route("/saude")
+def health():
+    # Rota para o ping de keep-alive: toca no banco para impedir que o
+    # Render (processo) e o Neon (Postgres) hibernem por ociosidade.
+    db.session.execute(db.text("SELECT 1"))
+    return jsonify(status="ok")
+
+
 @app.route("/")
 def index():
     if current_user.is_authenticated:
