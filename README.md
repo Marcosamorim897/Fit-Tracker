@@ -8,6 +8,7 @@ gráficos, medidas corporais, IMC e calendário.
 
 - **Cadastro e login** — contas com senha criptografada (hash), cada usuário vê apenas os próprios dados
 - **Fichas de treino** — crie fichas (ex.: Treino A / B / C) com exercícios, séries, repetições, descanso e observações
+- **Cronograma pronto** — em `/cronograma`, o programa introdutório completo (divisão superior/inferior, 5x por semana): estrutura semanal, aquecimento, cardio, dupla progressão e regras de ouro, com um botão que importa os 5 treinos como fichas na sua conta
 - **Registro de execução** — durante o treino, anote as repetições e os pesos de cada série; o app mostra a última carga usada como referência
 - **Histórico de treinos** — todas as sessões registradas, com volume total (reps × kg) e detalhe por exercício
 - **Medidas corporais** — peso, peitoral, cintura, quadril, braços, coxas, panturrilha e % de gordura, com histórico
@@ -52,6 +53,7 @@ e fica fora do controle de versão.
 ```
 ├── app.py           # Rotas e configuração do Flask
 ├── models.py        # Modelos do banco (SQLAlchemy)
+├── cronograma.py    # Dados do cronograma de treino (página + importação de fichas)
 ├── templates/       # Páginas HTML (Jinja)
 ├── static/
 │   ├── css/style.css

@@ -3,7 +3,10 @@
 {% block content %}
 <div class="page-header">
   <h1>Fichas de treino</h1>
-  <a class="btn btn-primary" href="{{ url_for('new_plan') }}">+ Nova ficha</a>
+  <div>
+    <a class="btn btn-primary" href="{{ url_for('new_plan') }}">+ Nova ficha</a>
+    <a class="btn btn-outline" href="{{ url_for('schedule') }}">Cronograma</a>
+  </div>
 </div>
 
 {% if items %}
@@ -27,7 +30,10 @@
 <div class="card">
   <p class="muted">Você ainda não criou nenhuma ficha de treino.
      Uma ficha é o seu plano: os exercícios, séries e repetições que você pretende fazer.</p>
-  <a class="btn btn-primary" href="{{ url_for('new_plan') }}">Criar minha primeira ficha</a>
+  <div class="card-actions">
+    <a class="btn btn-primary" href="{{ url_for('schedule') }}">Importar o cronograma pronto</a>
+    <a class="btn btn-outline" href="{{ url_for('new_plan') }}">Criar ficha do zero</a>
+  </div>
 </div>
 {% endif %}
 {% endblock %}

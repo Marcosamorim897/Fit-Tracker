@@ -21,6 +21,7 @@ from flask_login import (
     logout_user,
 )
 
+import cronograma as cron
 from models import (
     Measurement,
     PlanExercise,
@@ -415,6 +416,69 @@ def delete_exercise(exercise_id):
     db.session.commit()
     flash("Exercício removido da ficha.", "info")
     return redirect(url_for("plan_detail", plan_id=plan_id))
+
+
+# ------------------------------------------------------------- cronograma
+
+
+@app.route("/cronograma")
+@login_required
+def schedule():
+    # Mapa nome da ficha -> ficha já existente, para marcar o que foi importado
+    existing = {
+        p.name: p
+        for p in WorkoutPlan.query.filter_by(user_id=current_user.id).all()
+    }
+    return render_template("cronograma.html", cron=cron, existing=existing)
+
+
+@app.route("/cronograma/importar", methods=["POST"])
+@login_required
+def import_schedule():
+    existing = {
+        p.name for p in WorkoutPlan.query.filter_by(user_id=current_user.id).all()
+    }
+    created = 0
+    for treino in cron.TREINOS:
+        name = cron.nome_ficha(treino)
+        if name in existing:
+            continue
+        plan = WorkoutPlan(
+            user_id=current_user.id,
+            name=name,
+            description=cron.descricao_ficha(treino),
+            active=True,
+        )
+        db.session.add(plan)
+        db.session.flush()  # precisa do plan.id para os exercícios
+        for position, (ex_name, group, sets, reps, rest, notes) in enumerate(
+            treino["exercicios"]
+        ):
+            db.session.add(
+                PlanExercise(
+                    plan_id=plan.id,
+                    name=ex_name,
+                    muscle_group=group,
+                    target_sets=sets,
+                    target_reps=reps,
+                    rest_seconds=rest,
+                    notes=notes,
+                    position=position,
+                )
+            )
+        created += 1
+
+    if created:
+        db.session.commit()
+        skipped = len(cron.TREINOS) - created
+        msg = f"{created} ficha(s) criada(s) a partir do cronograma."
+        if skipped:
+            msg += f" {skipped} já existia(m) e foi(ram) mantida(s)."
+        flash(msg, "success")
+        return redirect(url_for("plans"))
+
+    flash("Todas as fichas do cronograma já estavam na sua conta.", "info")
+    return redirect(url_for("schedule"))
 
 
 # ---------------------------------------------------------------- treinos
