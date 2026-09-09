@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Cronograma{% endblock %}
+{% block content %}
+{% set faltando = [] %}
+{% for t in cron.TREINOS if cron.nome_ficha(t) not in existing %}{% set _ = faltando.append(t) %}{% endfor %}
+
+<div class="page-header">
+  <div>
+    <h1>{{ cron.META.titulo }}</h1>
+    <p class="muted">{{ cron.META.subtitulo }}</p>
+  </div>
+  {% if faltando %}
+  <form method="post" action="{{ url_for('import_schedule') }}"
+        onsubmit="return confirm('Criar {{ faltando|length }} ficha(s) de treino a partir deste cronograma?')">
+    <button class="btn btn-primary" type="submit">Importar {{ faltando|length }} ficha(s)</button>
+  </form>
+  {% else %}
+  <a class="btn btn-outline" href="{{ url_for('plans') }}">Ver minhas fichas</a>
+  {% endif %}
+</div>
+
+<section class="card">
+  <div class="stats-grid">
+    <div class="stat">
+      <span class="stat-value">5x</span>
+      <span class="stat-label">por semana</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ cron.META.duracao }}</span>
+      <span class="stat-label">por sessão</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">2x</span>
+      <span class="stat-label">por grupo muscular</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">Objetivo</span>
+      <span class="stat-label">{{ cron.META.objetivo }}</span>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h3>Estrutura semanal</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dia</th><th>Treino</th></tr></thead>
+      <tbody>
+        {% for dia, treino in cron.ESTRUTURA_SEMANAL %}
+        <tr><td><strong>{{ dia }}</strong></td><td>{{ treino }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="alert alert-warning">{{ cron.AVISO_SEMANA }}</div>
+</section>
+
+<section class="card">
+  <h3>Aquecimento — todos os dias (6 a 8 min)</h3>
+  <ol>
+    {% for item in cron.AQUECIMENTO %}<li>{{ item }}</li>{% endfor %}
+  </ol>
+</section>
+
+{% for treino in cron.TREINOS %}
+{% set ficha = existing.get(cron.nome_ficha(treino)) %}
+<section class="card">
+  <div class="card-header">
+    <h3>Treino {{ treino.codigo }} — {{ treino.foco }}</h3>
+    <span class="badge">{{ treino.dia }}</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Exercício</th><th>Grupo</th><th>Séries × Reps</th><th>Descanso</th><th>Obs.</th></tr>
+      </thead>
+      <tbody>
+        {% for nome, grupo, series, reps, descanso, obs in treino.exercicios %}
+        <tr>
+          <td><strong>{{ nome }}</strong></td>
+          <td>{{ grupo }}</td>
+          <td>{{ series }} × {{ reps }}</td>
+          <td>{{ (descanso ~ 's') if descanso else '—' }}</td>
+          <td class="muted">{{ obs or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if ficha %}
+  <div class="card-actions">
+    <a class="btn btn-sm btn-primary" href="{{ url_for('log_workout', plan_id=ficha.id) }}">Treinar</a>
+    <a class="btn btn-sm btn-outline" href="{{ url_for('plan_detail', plan_id=ficha.id) }}">Ver ficha</a>
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
+
+<section class="card">
+  <h3>Cardio</h3>
+  <ul>
+    {% for item in cron.CARDIO %}<li>{{ item }}</li>{% endfor %}
+  </ul>
+</section>
+
+<section class="card">
+  <h3>Progressão de carga</h3>
+  <p class="muted">Use a regra da <strong>dupla progressão</strong>:</p>
+  <ol>
+    {% for item in cron.PROGRESSAO %}<li>{{ item }}</li>{% endfor %}
+  </ol>
+  <div class="alert alert-info">{{ cron.AVISO_PROGRESSAO }}</div>
+</section>
+
+<section class="card">
+  <h3>Regras de ouro para os primeiros 3 meses</h3>
+  <ul>
+    {% for titulo, texto in cron.REGRAS_DE_OURO %}
+    <li><strong>{{ titulo }}</strong> {{ texto }}</li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="card">
+  <h3>Sobre a perda de gordura</h3>
+  {% for paragrafo in cron.PERDA_DE_GORDURA %}
+  <p>{{ paragrafo }}</p>
+  {% endfor %}
+  <p class="muted">{{ cron.META.ciclo }}</p>
+</section>
+{% endblock %}
