@@ -6,7 +6,9 @@
  *    nunca servimos do cache uma página autenticada possivelmente velha.
  */
 
-const CACHE = "fittracker-v1";
+// Bump a versão sempre que um arquivo do PRECACHE mudar: o activate apaga os
+// caches antigos, senão o celular continua servindo o CSS/JS velho.
+const CACHE = "fittracker-v2";
 const PRECACHE = [
   "/static/css/style.css",
   "/static/js/progress.js",
