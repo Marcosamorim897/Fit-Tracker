@@ -167,6 +167,7 @@ h4 { margin: 0.5rem 0; }
 
 .stat { text-align: center; padding: 1rem; }
 .stat-value { display: block; font-size: 1.9rem; font-weight: 700; color: var(--primary); }
+.stat-value.stat-text { font-size: 1.05rem; line-height: 1.35; }
 .stat-label { color: var(--muted); font-size: 0.85rem; }
 
 /* ---------- forms ---------- */
@@ -186,6 +187,7 @@ input, textarea, select {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #fdfcfa;
+  max-width: 100%;
 }
 
 input:focus, textarea:focus, select:focus {
@@ -256,6 +258,9 @@ input:focus, textarea:focus, select:focus {
 /* ---------- tables ---------- */
 .table-wrap { overflow-x: auto; }
 
+/* tabelas do cronograma: texto quebra linha em vez de rolar na horizontal */
+.table-cron th, .table-cron td { white-space: normal; }
+
 table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
 
 th, td {
@@ -286,12 +291,16 @@ td form { margin: 0; }
 /* ---------- workout logging ---------- */
 .sets-grid { display: flex; flex-direction: column; gap: 0.45rem; }
 
+/* minmax(0, 1fr) + min-width nos inputs: sem isso a largura intrínseca do
+   <input> (~170px) vira o mínimo da coluna e a linha estoura a tela no celular */
 .set-row {
   display: grid;
-  grid-template-columns: 90px 1fr 1fr;
+  grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.6rem;
   align-items: center;
 }
+
+.set-row input { width: 100%; min-width: 0; }
 
 .set-label { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
 
@@ -324,3 +333,20 @@ td form { margin: 0; }
 .calendar-nav { display: flex; align-items: center; gap: 0.8rem; }
 
 canvas { max-width: 100%; }
+
+/* ---------- telas pequenas ---------- */
+@media (max-width: 480px) {
+  .container { padding: 1rem 0.85rem; }
+  h1 { font-size: 1.45rem; }
+  .stats-grid { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 0.7rem; }
+  .stat { padding: 0.7rem 0.4rem; }
+  .stat-value { font-size: 1.5rem; }
+  .stat-value.stat-text { font-size: 0.95rem; }
+  .set-row { grid-template-columns: 58px minmax(0, 1fr) minmax(0, 1fr); gap: 0.45rem; }
+  .set-row input { padding: 0.6rem 0.55rem; }
+  .card { padding: 0.9rem; }
+  .page-header .btn { flex: 1; text-align: center; }
+  /* no celular a coluna "Grupo" sai: o título do treino já dá o contexto */
+  .table-cron .col-grupo { display: none; }
+  .table-cron th, .table-cron td { padding: 0.5rem 0.4rem; font-size: 0.86rem; }
+}

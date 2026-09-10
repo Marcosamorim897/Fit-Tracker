@@ -34,8 +34,8 @@
       <span class="stat-label">por grupo muscular</span>
     </div>
     <div class="stat">
-      <span class="stat-value">Objetivo</span>
-      <span class="stat-label">{{ cron.META.objetivo }}</span>
+      <span class="stat-value stat-text">{{ cron.META.objetivo }}</span>
+      <span class="stat-label">objetivo</span>
     </div>
   </div>
 </section>
@@ -43,7 +43,7 @@
 <section class="card">
   <h3>Estrutura semanal</h3>
   <div class="table-wrap">
-    <table>
+    <table class="table-cron">
       <thead><tr><th>Dia</th><th>Treino</th></tr></thead>
       <tbody>
         {% for dia, treino in cron.ESTRUTURA_SEMANAL %}
@@ -70,18 +70,18 @@
     <span class="badge">{{ treino.dia }}</span>
   </div>
   <div class="table-wrap">
-    <table>
+    <table class="table-cron">
       <thead>
-        <tr><th>Exercício</th><th>Grupo</th><th>Séries × Reps</th><th>Descanso</th><th>Obs.</th></tr>
+        <tr><th>Exercício</th><th class="col-grupo">Grupo</th><th>Séries × Reps</th><th>Descanso</th><th class="col-obs">Obs.</th></tr>
       </thead>
       <tbody>
         {% for nome, grupo, series, reps, descanso, obs in treino.exercicios %}
         <tr>
           <td><strong>{{ nome }}</strong></td>
-          <td>{{ grupo }}</td>
+          <td class="col-grupo">{{ grupo }}</td>
           <td>{{ series }} × {{ reps }}</td>
           <td>{{ (descanso ~ 's') if descanso else '—' }}</td>
-          <td class="muted">{{ obs or '—' }}</td>
+          <td class="muted col-obs">{{ obs or '—' }}</td>
         </tr>
         {% endfor %}
       </tbody>
