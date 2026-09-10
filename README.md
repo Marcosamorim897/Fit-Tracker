@@ -1,4 +1,4 @@
-# 🏋️ FitTracker
+#  FitTracker
 
 Aplicação web para controle de treinos e saúde: monte suas fichas de treino,
 registre repetições e cargas a cada sessão e acompanhe sua evolução com
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Acesse **http://127.0.0.1:5000**, crie sua conta e comece a treinar. 💪
+Acesse **http://127.0.0.1:5000**, crie sua conta e comece a treinar. 
 
 O banco (`fittracker.db`, SQLite) é criado automaticamente na primeira execução
 e fica fora do controle de versão.
