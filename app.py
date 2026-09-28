@@ -44,6 +44,10 @@ _db_url = os.environ.get(
 )
 if _db_url.startswith("postgres://"):
     _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+# O SQLAlchemy 2.1 trocou o driver padrão de "postgresql://" para o psycopg 3,
+# que não está instalado; fixar o psycopg2 evita que o app quebre ao iniciar.
+if _db_url.startswith("postgresql://"):
+    _db_url = _db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = _db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Bancos serverless (Neon) fecham conexões ociosas; sem isso, a primeira
