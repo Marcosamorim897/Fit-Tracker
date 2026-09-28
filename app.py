@@ -22,6 +22,7 @@ from flask_login import (
 )
 
 import cronograma as cron
+import fichas_academia
 from models import (
     Measurement,
     PlanExercise,
@@ -322,7 +323,56 @@ def plans():
         .order_by(WorkoutPlan.active.desc(), WorkoutPlan.created_at.desc())
         .all()
     )
-    return render_template("plans.html", items=items)
+    existing = {p.name for p in items}
+    academia_missing = [
+        f["name"] for f in fichas_academia.FICHAS if f["name"] not in existing
+    ]
+    return render_template(
+        "plans.html", items=items, academia_missing=academia_missing
+    )
+
+
+@app.route("/fichas/importar-academia", methods=["POST"])
+@login_required
+def import_academia():
+    existing = {
+        p.name for p in WorkoutPlan.query.filter_by(user_id=current_user.id).all()
+    }
+    created = 0
+    for ficha in fichas_academia.FICHAS:
+        if ficha["name"] in existing:
+            continue
+        plan = WorkoutPlan(
+            user_id=current_user.id,
+            name=ficha["name"],
+            description=ficha["description"],
+            active=True,
+        )
+        db.session.add(plan)
+        db.session.flush()  # precisa do plan.id para os exercícios
+        for position, (ex_name, group, sets, reps, rest, notes) in enumerate(
+            ficha["exercises"]
+        ):
+            db.session.add(
+                PlanExercise(
+                    plan_id=plan.id,
+                    name=ex_name,
+                    muscle_group=group,
+                    target_sets=sets,
+                    target_reps=reps,
+                    rest_seconds=rest,
+                    notes=notes,
+                    position=position,
+                )
+            )
+        created += 1
+
+    if created:
+        db.session.commit()
+        flash(f"{created} ficha(s) da academia importada(s).", "success")
+    else:
+        flash("As fichas da academia já estavam na sua conta.", "info")
+    return redirect(url_for("plans"))
 
 
 @app.route("/fichas/nova", methods=["GET", "POST"])
