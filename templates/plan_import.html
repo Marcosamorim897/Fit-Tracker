@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Importar planilha{% endblock %}
+{% block content %}
+<div class="auth-card card">
+  <h2>Importar fichas de uma planilha</h2>
+  <p class="muted">Envie um arquivo do Excel (.xlsx) ou .csv. Cada linha é um exercício;
+     a coluna <strong>Ficha</strong> diz a qual ficha ele pertence. Fichas com um nome que
+     já existe na sua conta são mantidas, sem duplicar.</p>
+  <form method="post" enctype="multipart/form-data">
+    <label>Arquivo da planilha*
+      <input type="file" name="arquivo" required
+             accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv">
+    </label>
+    <button class="btn btn-primary btn-block" type="submit">Importar</button>
+  </form>
+  <p class="muted">Colunas reconhecidas: Ficha, Descrição da ficha, Exercício, Grupo muscular,
+     Séries, Repetições (ou Volume, como 3x12), Descanso (em segundos ou "1 min") e Observações.
+     Sem a coluna Ficha, cada aba do Excel vira uma ficha com o nome da aba.</p>
+  <a class="btn btn-outline btn-block" href="{{ url_for('static', filename='modelo-fichas.xlsx') }}" download>
+    Baixar planilha modelo
+  </a>
+</div>
+{% endblock %}

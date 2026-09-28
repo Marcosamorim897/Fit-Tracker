@@ -23,6 +23,7 @@ from flask_login import (
 
 import cronograma as cron
 import fichas_academia
+from importar_planilha import PlanilhaInvalida, ler_planilha
 from models import (
     Measurement,
     PlanExercise,
@@ -50,6 +51,7 @@ if _db_url.startswith("postgresql://"):
     _db_url = _db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = _db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # upload de planilhas
 # Bancos serverless (Neon) fecham conexões ociosas; sem isso, a primeira
 # operação após ~5 min de inatividade falha com 500.
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
@@ -336,16 +338,20 @@ def plans():
     )
 
 
-@app.route("/fichas/importar-academia", methods=["POST"])
-@login_required
-def import_academia():
+def create_missing_plans(fichas):
+    """Cria para o usuário logado as fichas cujo nome ainda não existe.
+
+    Devolve (criadas, puladas) com os nomes. Não faz commit.
+    """
     existing = {
         p.name for p in WorkoutPlan.query.filter_by(user_id=current_user.id).all()
     }
-    created = 0
-    for ficha in fichas_academia.FICHAS:
+    created, skipped = [], []
+    for ficha in fichas:
         if ficha["name"] in existing:
+            skipped.append(ficha["name"])
             continue
+        existing.add(ficha["name"])
         plan = WorkoutPlan(
             user_id=current_user.id,
             name=ficha["name"],
@@ -369,14 +375,56 @@ def import_academia():
                     position=position,
                 )
             )
-        created += 1
+        created.append(ficha["name"])
+    return created, skipped
 
+
+@app.route("/fichas/importar-academia", methods=["POST"])
+@login_required
+def import_academia():
+    created, _skipped = create_missing_plans(fichas_academia.FICHAS)
     if created:
         db.session.commit()
-        flash(f"{created} ficha(s) da academia importada(s).", "success")
+        flash(f"{len(created)} ficha(s) da academia importada(s).", "success")
     else:
         flash("As fichas da academia já estavam na sua conta.", "info")
     return redirect(url_for("plans"))
+
+
+@app.route("/fichas/importar", methods=["GET", "POST"])
+@login_required
+def import_spreadsheet():
+    if request.method == "POST":
+        arquivo = request.files.get("arquivo")
+        if not arquivo or not arquivo.filename:
+            flash("Escolha o arquivo da planilha.", "danger")
+            return redirect(url_for("import_spreadsheet"))
+        try:
+            fichas = ler_planilha(arquivo.filename, arquivo.read())
+        except PlanilhaInvalida as erro:
+            flash(str(erro), "danger")
+            return redirect(url_for("import_spreadsheet"))
+
+        created, skipped = create_missing_plans(fichas)
+        db.session.commit()
+        if created:
+            msg = f"{len(created)} ficha(s) importada(s): {', '.join(created)}."
+            if skipped:
+                msg += f" Já existiam e foram mantidas: {', '.join(skipped)}."
+            flash(msg, "success")
+        else:
+            flash(
+                "Todas as fichas da planilha já existiam: " + ", ".join(skipped) + ".",
+                "info",
+            )
+        return redirect(url_for("plans"))
+    return render_template("plan_import.html")
+
+
+@app.errorhandler(413)
+def upload_too_large(_error):
+    flash("Arquivo grande demais (limite de 2 MB).", "danger")
+    return redirect(url_for("import_spreadsheet"))
 
 
 @app.route("/fichas/nova", methods=["GET", "POST"])
