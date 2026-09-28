@@ -88,7 +88,7 @@ PLANO = [
 ]
 
 
-def seed(email, substituir=False):
+def seed(email, substituir=False, plano=PLANO):
     user = User.query.filter_by(email=email).first()
     if not user:
         emails = [u.email for u in User.query.all()]
@@ -99,7 +99,7 @@ def seed(email, substituir=False):
 
     criadas, puladas = 0, 0
 
-    for ficha in PLANO:
+    for ficha in plano:
         existente = WorkoutPlan.query.filter_by(
             user_id=user.id, name=ficha["name"]
         ).first()
@@ -143,8 +143,8 @@ def seed(email, substituir=False):
     return 0
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Popula as fichas do plano de 5 dias.")
+def main(plano=PLANO, descricao="Popula as fichas do plano de 5 dias."):
+    parser = argparse.ArgumentParser(description=descricao)
     parser.add_argument("--email", required=True, help="E-mail da conta no Fit-Tracker")
     parser.add_argument(
         "--substituir",
@@ -154,7 +154,7 @@ def main():
     args = parser.parse_args()
 
     with app.app_context():
-        sys.exit(seed(args.email, args.substituir))
+        sys.exit(seed(args.email, args.substituir, plano))
 
 
 if __name__ == "__main__":
